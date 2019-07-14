@@ -3,7 +3,8 @@ require('dotenv').config();
 const config = {
     elasticSearch: {
         uri: process.env.ELASTIC_URI,
-        indexName: "producto_parent_child",
+        parentChildIndexName: "producto_parent_child",
+        nestedIndexName: "producto_nested",
         indexTpe: "_doc"
     },
     mongodb: {

@@ -1,0 +1,23 @@
+PUT producto_nested
+{
+    "settings" : {
+        "number_of_shards" : 2,
+        "number_of_replicas": "0"
+    },
+    "mappings" : {
+      "_doc": {
+        "properties" : {
+            "personalizaciones": {
+                "type": "nested",
+                "properties":{
+                    "AnioCampanaVenta": {"type": "keyword"},
+                    "CUV": {"type": "keyword"},
+                    "TipoPersonalizacion": {"type": "keyword"},
+                    "CodConsultora": {"type": "keyword"},
+                    "DiaInicio": {"type": "integer"}
+                }
+            }
+        }
+      }
+    }
+}

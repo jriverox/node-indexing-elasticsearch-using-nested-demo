@@ -1,0 +1,20 @@
+PUT producto_parent_child
+{
+    "settings" : {
+        "number_of_shards" : 2,
+        "number_of_replicas": "0"
+    },
+    "mappings" : {
+      "_doc": {
+        "properties" : {
+            "relation": {
+                "type": "join",
+                "eager_global_ordinals": true,
+                "relations": {
+                    "parent": "child"
+                }
+            }
+        }
+      }
+    }
+}

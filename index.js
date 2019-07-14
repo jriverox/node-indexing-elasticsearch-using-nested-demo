@@ -2,13 +2,13 @@ const repository = require('./mongoRepository');
 const esWrapper = require('./elasticWrapper');
 const batchSize = 5000;
 
-async function execute (campania, tipoPersonalizacion){
+async function execute (campania, tipoPersonalizacion, option ="parent"){
     let start = new Date();
-    console.log(`ejecutando para la campaña: ${campania}, y el Tipo de personalizacion: ${tipoPersonalizacion}`);
+    console.log(`ejecutando opcion: ${option} para la campaña: ${campania}, y el Tipo de personalizacion: ${tipoPersonalizacion}`);
     try {
-        await syncEstrategias(campania, tipoPersonalizacion);
+        await syncEstrategias(campania, tipoPersonalizacion, option);
         
-        await syncPersonalizaciones(campania, tipoPersonalizacion);
+        await syncPersonalizaciones(campania, tipoPersonalizacion, option);
         let end = new Date();
         console.log(`Sinconizacion finalizada, tiempo total: ${end - start}`);
         
@@ -17,7 +17,7 @@ async function execute (campania, tipoPersonalizacion){
     }
 };
 
-async function syncEstrategias(campania, tipoPersonalizacion){
+async function syncEstrategias(campania, tipoPersonalizacion, option ="parent"){
     const query = {
         CodigoCampania: campania,
         TipoPersonalizacion: tipoPersonalizacion
@@ -32,13 +32,16 @@ async function syncEstrategias(campania, tipoPersonalizacion){
         if(!estrategias)
             throw new Error("estrategias nulo");
         if(estrategias.length > 0){
-            await esWrapper.syncEstrategias(estrategias);
+            if(option === "parent")
+                await esWrapper.syncEstrategiasParentChild(estrategias);
+            else
+                await esWrapper.syncEstrategiasNested(estrategias);
             console.log(`Registros procesados ${processedCount}`);
         }
     }
 }
 
-async function syncPersonalizaciones(campania, tipoPersonalizacion){
+async function syncPersonalizaciones(campania, tipoPersonalizacion, option ="parent"){
     const query = {
         AnioCampanaVenta: campania,
         TipoPersonalizacion: tipoPersonalizacion
@@ -55,10 +58,13 @@ async function syncPersonalizaciones(campania, tipoPersonalizacion){
         if(!personalizaciones)
             throw new Error("estrategias nulo");
         if(personalizaciones.length > 0){
-            await esWrapper.syncPersonalizaciones(personalizaciones);
+            if(option === "parent")
+                await esWrapper.syncPersonalizacionesParentChild(personalizaciones);
+            else
+                await esWrapper.syncPersonalizacionesNested(personalizaciones);
             console.log(`Registros procesados ${processedCount}`);
         }
     }
 }
 
-execute("201911", "LAN");
+execute("201911", "LAN", "nested");
