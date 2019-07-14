@@ -1,0 +1,21 @@
+{
+  "name": "indexing-elasticsearch-nodejs",
+  "version": "1.0.0",
+  "description": "elasticsearch indexing example using bulk",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "elasticsearch",
+    "nodejs"
+  ],
+  "author": "jhony rivero",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "elasticsearch": "^16.3.0",
+    "mongodb": "^3.2.7"
+  }
+}
