@@ -105,7 +105,7 @@ let syncPersonalizacionesNested = async (personalizaciones) => {
             FlagRevista: item.FlagRevista,
             MaterialGanancia: item.MaterialGanancia
         };
-        let indexType = config.elasticSearch.indexTpe;
+
         body.push(
             { update : {_id : parentId, _index : config.elasticSearch.nestedIndexName, _type: config.elasticSearch.indexTpe, retry_on_conflict : 3} },
             { doc: {personalizaciones : personalizacion}, doc_as_upsert : true }

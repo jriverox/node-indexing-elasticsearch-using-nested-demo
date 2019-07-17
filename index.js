@@ -67,4 +67,19 @@ async function syncPersonalizaciones(campania, tipoPersonalizacion, option ="par
     }
 }
 
-execute("201911", "LAN", "nested");
+async function checkDb(campania, tipoPersonalizacion){
+    try {
+        const query = {
+            CodigoCampania: campania,
+            TipoPersonalizacion: tipoPersonalizacion
+        };
+        let count = await repository.getCountEstrategias(query);
+        console.log("Registros encontrados: ", count);
+        
+    } catch (error) {
+        console.error(error);
+    }
+    
+}
+//execute("201911", "LAN", "nested");
+checkDb("201911", "LAN");
