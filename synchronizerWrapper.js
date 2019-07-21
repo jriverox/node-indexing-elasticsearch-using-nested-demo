@@ -5,8 +5,9 @@
  * @param {*} personalizationType 
  * @param {*} option = {0 = denormalized, 1 = parenChild, 2 = nested}
  */
-let execute = async (campaign, personalizationType, option = 0)=>{
+let execute = async (campaign, personalizationType, option)=>{
     let elasticSynchronizer;
+    opton = parseInt(option);
     switch (option) {
         case 1:
             elasticSynchronizer = require("./elastic/parentChildSynchronizer");

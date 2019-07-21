@@ -61,15 +61,15 @@ let syncPersonalizations = async (campaign, personalizationType) => {
     let count = await repository.getCountPersonalizations(query);
     let processedCount = 0;
     console.log(`Personalizaciones: ${count}`);
+    let elasticClient = elasticHelper.getElasticClient();
 
     for (let page = 0; processedCount < count; page++) {
         
         let personalizations = await repository.getPersonalizationsPaged(query, batchSize, page);
         processedCount += personalizations.length;
-        if(!personalizations)
-            throw new Error("estrategias nulo");
+        
         if(personalizations.length > 0){
-            await sendPersonalizationsToElastic(personalizations, elasticHelper.getElasticClient());
+            await sendPersonalizationsToElastic(personalizations, elasticClient);
             console.log(`Registros procesados ${processedCount}`);
         }
     }
