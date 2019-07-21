@@ -7,7 +7,8 @@
  */
 let execute = async (campaign, personalizationType, option)=>{
     let elasticSynchronizer;
-    opton = parseInt(option);
+    option = parseInt(option);
+    console.log(option);
     switch (option) {
         case 1:
             elasticSynchronizer = require("./elastic/parentChildSynchronizer");
