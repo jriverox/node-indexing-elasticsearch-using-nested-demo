@@ -104,6 +104,7 @@ async function sendPersonalizationsToElastic(personalizations, elasticClient){
     const bulkResponse = await elasticClient.bulk({
         body
     });
+    console.log(bulkResponse);
 }
 
 module.exports = {
