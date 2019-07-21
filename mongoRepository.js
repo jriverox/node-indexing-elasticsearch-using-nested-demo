@@ -5,7 +5,7 @@ async function getClient(){
     return await mongoClient.connect(config.mongodb.connectionString, {useNewUrlParser: true});
 }
 
-let getCountEstrategias = async (query) => {
+let getCountStrategies = async (query) => {
     const client = await getClient();
     if(!client){
         return;
@@ -23,7 +23,7 @@ let getCountEstrategias = async (query) => {
     }
 };
 
-let getEstrategias = async (query, limit = 100, page=0) => {    
+let getStrategiesPaged = async (query, limit = 100, page=0) => {    
     // const client = await mongoClient.connect(config.mongodb.connectionString, {useNewUrlParser: true});
 
     const client = await getClient();
@@ -47,7 +47,7 @@ let getEstrategias = async (query, limit = 100, page=0) => {
     }
 };
 
-let getCountPersonalizaciones = async (query) => {
+let getCountPersonalizations = async (query) => {
     const client = await getClient();
     if(!client){
         return;
@@ -65,7 +65,7 @@ let getCountPersonalizaciones = async (query) => {
     }
 };
 
-let getPersonalizaciones = async (query, limit = 100, page=0) => {
+let getPersonalizationsPaged = async (query, limit = 100, page=0) => {
     const client = await getClient();
 
         if(!client){
@@ -90,9 +90,39 @@ let getPersonalizaciones = async (query, limit = 100, page=0) => {
         }
 };
 
+let getPersonalizationsByStrategy = async (campaign, personalizationType, cuv) => {
+    const client = await getClient();
+
+    if(!client){
+        return;
+    }
+
+    try {
+        const db = client.db(config.mongodb.database)
+        let collection  = db.collection("OfertaPersonalizada");
+        let projection = {_id: 0, AnioCampanaVenta: 1, CUV: 1, TipoPersonalizacion: 1, CodConsultora: 1, DiaInicio: 1, FlagRevista: 1 };
+        let sort = { CodConsultora: 1};
+        let query = {
+            AnioCampanaVenta: campaign,
+            TipoPersonalizacion: personalizationType,
+            CUV: cuv
+        };
+
+        return await collection.find(query, projection)
+            .sort(sort)
+            .toArray();
+
+    } catch (error) {
+        console.log(error);  
+    } finally{
+        client.close();
+    }
+};
+
 module.exports = {
-    getEstrategias,
-    getCountEstrategias,
-    getPersonalizaciones,
-    getCountPersonalizaciones
+    getStrategiesPaged,
+    getCountStrategies,
+    getPersonalizationsPaged,
+    getCountPersonalizations,
+    getPersonalizationsByStrategy
 };

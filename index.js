@@ -1,14 +1,13 @@
+const synchronizer = require('./synchronizerWrapper');
+const elasticHelper = require('./elastic/elasticHelper');
 const repository = require('./mongoRepository');
-const esWrapper = require('./elasticWrapper');
-const batchSize = 5000;
+const config = require("./config");
 
-async function execute (campania, tipoPersonalizacion, option ="parent"){
+async function run (campaign, personalizationType, option){
     let start = new Date();
-    console.log(`ejecutando opcion: ${option} para la campaña: ${campania}, y el Tipo de personalizacion: ${tipoPersonalizacion}`);
+    console.log(`ejecutando opcion: ${option} para la campaña: ${campaign}, y el Tipo de personalizacion: ${personalizationType}`);
     try {
-        await syncEstrategias(campania, tipoPersonalizacion, option);
-        
-        await syncPersonalizaciones(campania, tipoPersonalizacion, option);
+        await synchronizer.execute(campaign, personalizationType, option);
         let end = new Date();
         console.log(`Sinconizacion finalizada, tiempo total: ${end - start}`);
         
@@ -17,61 +16,12 @@ async function execute (campania, tipoPersonalizacion, option ="parent"){
     }
 };
 
-async function syncEstrategias(campania, tipoPersonalizacion, option ="parent"){
-    const query = {
-        CodigoCampania: campania,
-        TipoPersonalizacion: tipoPersonalizacion
-    };
-    let count = await repository.getCountEstrategias(query);
-    let processedCount = 0;
-    console.log(`Estratgias: ${count}`);
-    for (let page = 0; processedCount < count; page++) {
-        console.log(count);
-        let estrategias = await repository.getEstrategias(query, batchSize, page);
-        processedCount += estrategias.length;
-        if(!estrategias)
-            throw new Error("estrategias nulo");
-        if(estrategias.length > 0){
-            if(option === "parent")
-                await esWrapper.syncEstrategiasParentChild(estrategias);
-            else
-                await esWrapper.syncEstrategiasNested(estrategias);
-            console.log(`Registros procesados ${processedCount}`);
-        }
-    }
-}
 
-async function syncPersonalizaciones(campania, tipoPersonalizacion, option ="parent"){
-    const query = {
-        AnioCampanaVenta: campania,
-        TipoPersonalizacion: tipoPersonalizacion
-    };
-
-    let count = await repository.getCountPersonalizaciones(query);
-    let processedCount = 0;
-    console.log(`Personalizaciones: ${count}`);
-
-    for (let page = 0; processedCount < count; page++) {
-        
-        let personalizaciones = await repository.getPersonalizaciones(query, batchSize, page);
-        processedCount += personalizaciones.length;
-        if(!personalizaciones)
-            throw new Error("estrategias nulo");
-        if(personalizaciones.length > 0){
-            if(option === "parent")
-                await esWrapper.syncPersonalizacionesParentChild(personalizaciones);
-            else
-                await esWrapper.syncPersonalizacionesNested(personalizaciones);
-            console.log(`Registros procesados ${processedCount}`);
-        }
-    }
-}
-
-async function checkDb(campania, tipoPersonalizacion){
+async function checkMongoDb(campaign, personalizationType){
     try {
         const query = {
-            CodigoCampania: campania,
-            TipoPersonalizacion: tipoPersonalizacion
+            CodigoCampania: campaign,
+            TipoPersonalizacion: personalizationType
         };
         let count = await repository.getCountEstrategias(query);
         console.log("Registros encontrados: ", count);
@@ -81,5 +31,21 @@ async function checkDb(campania, tipoPersonalizacion){
     }
     
 }
-//execute("201911", "LAN", "nested");
-checkDb("201911", "LAN");
+
+function checkElasticsearch(){
+    let client = elasticHelper.getElasticClient();
+    client.ping((error) => {
+        if (error) {
+          console.trace('elasticsearch cluster is down!');
+        } console.log('All is well');
+      });
+}
+
+/*
+0 = denormalized
+1 = parenChild
+2 = nested
+*/
+run("201911", "SR", 2);
+//checkDb("201911", "LAN");
+//checkElasticsearch();
