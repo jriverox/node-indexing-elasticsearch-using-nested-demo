@@ -40,12 +40,16 @@ function checkElasticsearch(){
         } console.log('All is well');
       });
 }
-
+function test(p1, p2){
+    console.log("test params", p1, p2);
+}
 /*
 0 = denormalized
 1 = parenChild
 2 = nested
 */
-run("201911", "SR", 2);
+//run("201911", "SR", 0);
+run(process.argv[2], process.argv[3], process.argv[4]);
 //checkDb("201911", "LAN");
 //checkElasticsearch();
+//test(process.argv[2], process.argv[3]);
