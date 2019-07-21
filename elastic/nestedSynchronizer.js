@@ -48,22 +48,28 @@ let syncStrategies = async (campaign, personalizationType) => {
 
 
 async function sendStrategiesToElastic(strategies, elasticClient){
-    let body = [];
 
-    strategies.forEach((item) => {
-
-        let id = idGenerator.getIdForStrategy(item.CodigoCampania, item.CUV2, item.TipoPersonalizacion);
-        console.log(id, item.personalizaciones);
-        body.push(
-            { index:  { _index: config.elasticSearch.nestedIndexName, _type: config.elasticSearch.indexTpe, _id: id} },
-            item
-        );
-    });
+    try {
+        let body = [];
     
-    const bulkResponse = await elasticClient.bulk({
-        body
-    });
-    //console.log(bulkResponse);
+        strategies.forEach((item) => {
+    
+            let id = idGenerator.getIdForStrategy(item.CodigoCampania, item.CUV2, item.TipoPersonalizacion);
+            //console.log(id, item.personalizaciones);
+            body.push(
+                { index:  { _index: config.elasticSearch.nestedIndexName, _type: config.elasticSearch.indexTpe, _id: id} },
+                item
+            );
+        });
+        
+        const bulkResponse = await elasticClient.bulk({
+            body
+        });
+        //console.log(bulkResponse);
+        
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 module.exports = {

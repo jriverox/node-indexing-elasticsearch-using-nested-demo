@@ -76,35 +76,40 @@ let syncPersonalizations = async (campaign, personalizationType) => {
 };
 
 async function sendPersonalizationsToElastic(personalizations, elasticClient){
-    let body = [];
-
-    personalizations.forEach((item) => {
-        let parentId = idGenerator.getIdForStrategy(item.AnioCampanaVenta, item.CUV, item.TipoPersonalizacion);
-        let id = idGenerator.getIdForPersonalization(item.AnioCampanaVenta, item.CUV, item.TipoPersonalizacion, item.CodConsultora, item.DiaInicio);
- 
-        let doc = {
-            AnioCampanaVenta: item.AnioCampanaVenta,
-            CUV: item.CUV,
-            TipoPersonalizacion: item.TipoPersonalizacion,
-            CodConsultora: item.CodConsultora,
-            DiaInicio: item.DiaInicio,
-            FlagRevista: item.FlagRevista,
-            MaterialGanancia: item.MaterialGanancia,
-            relation: relation = {
-                name: 'child',
-                parent: parentId
-            }
-        };
-
-        body.push(
-            { index:  { _index: config.elasticSearch.parentChildIndexName, _type: config.elasticSearch.indexTpe, _id: id,  _routing : parentId } },
-            doc
-        );
-    });
-    const bulkResponse = await elasticClient.bulk({
-        body
-    });
-    console.log(bulkResponse);
+    
+    try {
+        let body = [];
+    
+        personalizations.forEach((item) => {
+            let parentId = idGenerator.getIdForStrategy(item.AnioCampanaVenta, item.CUV, item.TipoPersonalizacion);
+            let id = idGenerator.getIdForPersonalization(item.AnioCampanaVenta, item.CUV, item.TipoPersonalizacion, item.CodConsultora, item.DiaInicio);
+     
+            let doc = {
+                AnioCampanaVenta: item.AnioCampanaVenta,
+                CUV: item.CUV,
+                TipoPersonalizacion: item.TipoPersonalizacion,
+                CodConsultora: item.CodConsultora,
+                DiaInicio: item.DiaInicio,
+                FlagRevista: item.FlagRevista,
+                MaterialGanancia: item.MaterialGanancia,
+                relation: relation = {
+                    name: 'child',
+                    parent: parentId
+                }
+            };
+    
+            body.push(
+                { index:  { _index: config.elasticSearch.parentChildIndexName, _type: config.elasticSearch.indexTpe, _id: id,  _routing : parentId } },
+                doc
+            );
+        });
+        const bulkResponse = await elasticClient.bulk({
+            body
+        });
+        
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 module.exports = {
