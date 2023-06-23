@@ -16,6 +16,6 @@
   "dependencies": {
     "dotenv": "^8.0.0",
     "elasticsearch": "^16.3.0",
-    "mongodb": "^3.2.7"
+    "mongodb": "^3.7.4"
   }
 }
